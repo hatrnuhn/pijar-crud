@@ -42,8 +42,8 @@ func main() {
 
 	rDB.Post("/produks", cfg.handleCreate)
 	rDB.Get("/produks", cfg.handleRead)
-	rDB.Put("/produks/{produkName}", handlePut)
-	rDB.Post("/produks/{produkName}", handleDel)
+	rDB.Put("/produks/{produkName}", cfg.handleUpdate)
+	rDB.Delete("/produks/{produkName}", cfg.handleDel)
 
 	rChi.Mount("/database", rDB)
 

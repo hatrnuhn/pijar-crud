@@ -48,7 +48,10 @@ func (db *DB) loadDB() (DBStructure, error) {
 
 	// unmarshals data from file if it's not empty
 	if len(body) != 0 {
-		return DBStructure{}, errors.New("unmarshal loadDB error")
+		err = json.Unmarshal(body, &dbS)
+		if err != nil {
+			return DBStructure{}, errors.New("unmarshal loadDB error")
+		}
 	} else {
 		dbS.Host = "localhost"
 		dbS.Database = "pijarcamp"
@@ -89,20 +92,13 @@ func (db *DB) CreateProduk(body string) (Produk, error) {
 		return Produk{}, errors.New("req body unmarshal error")
 	}
 
-	p := Produk{
-		NamaProduk: req.NamaProduk,
-		Keterangan: req.Keterangan,
-		Harga:      req.Harga,
-		Jumlah:     req.Jumlah,
-	}
-
-	dbS.Produks[p.NamaProduk] = p
+	dbS.Produks[req.NamaProduk] = req
 	err = db.writeDB(dbS)
 	if err != nil {
 		return Produk{}, err
 	}
 
-	return p, nil
+	return req, nil
 }
 
 func (db *DB) GetProduks() ([]Produk, error) {
@@ -114,7 +110,7 @@ func (db *DB) GetProduks() ([]Produk, error) {
 		return nil, err
 	}
 
-	ps := make([]Produk, len(dbS.Produks))
+	ps := make([]Produk, 0, len(dbS.Produks))
 	for _, p := range dbS.Produks {
 		ps = append(ps, p)
 	}
